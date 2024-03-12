@@ -24,7 +24,7 @@ For a list of these please refer to the official documentation:
  - [Dimensions](https://ads.tiktok.com/marketing_api/docs?id=1751443956638721)
  - [Metrics](https://ads.tiktok.com/marketing_api/docs?id=1751443967255553)
 
-## Installation
+## Examples
 
 ### To query data at the ad level:
 ```
