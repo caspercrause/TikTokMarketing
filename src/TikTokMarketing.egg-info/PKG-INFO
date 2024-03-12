@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: TikTokMarketing
+Version: 0.1.4
+Summary: A package designed to connect to the TikTok Marketing API and return data to report on.
+Author-email: Casper Crause <ccrause07@gmail.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8.0
+Description-Content-Type: text/markdown
+
+# TikTokMarketing
+
+This is a package you can use to download reporting data from the TikTok Marketing API
