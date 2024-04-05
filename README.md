@@ -11,7 +11,7 @@ Requires: `Python >=3.8.0` but has no additional dependencies. Under the hood `T
 `TikTokMarketing` supports the latest version of the API `v1.3`
 
 
-The API returns data on 4 distinct lelels:
+The API returns data on 4 distinct levels:
 
 1. AUCTION_ADVERTISER
 1. AUCTION_CAMPAIGN
@@ -136,4 +136,4 @@ for entry in result_list:
 TikTok_Data = pd.DataFrame(TikTok_Data)
 ```
 
-I've noticed that when trying to run `TikTokMarketing` in a docker containter, the `ip address` is blocked and the API response is `Client IP address is in banned Country list`
+I have noticed that when trying to run `TikTokMarketing` in a docker containter, the `ip address` is blocked and the API response is `Client IP address is in banned Country list`
