@@ -1,14 +1,23 @@
-# TikTokMarketing
+# TikTokMarketing [![Latest Version](https://img.shields.io/badge/pypi-0.1.4-blue?&link=https%3A%2F%2Fpypi.org%2Fproject%2Fgoogleadsquerytool%2F)](https://pypi.org/project/TikTokMarketing/)
 
-This is a package you can use to query reporting data from the TikTok Marketing API.
+This package enables efficient querying and retrieval of performance metrics from the TikTok Marketing API on different levels of granularity.
+
+## Build status
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen?label=build&color=lime)
+
+## Requirements
+ - Python 3.8+
 
 ## Installation
 ```
 pip install TikTokMarketing
 ```
-Requires: `Python >=3.8.0` but has no additional dependencies. Under the hood `TikTokMarketing` makes use of the `requests` and `json` modules.
-
-`TikTokMarketing` supports the latest version of the API `v1.3`
+## Features
+ - Distributed via PyPI.
+ - Wrapper around the TikTok Marketing API to assist marketers on a budget with their reporting.
+ - Under the hood `TikTokMarketing` makes use of the `requests` and `json` modules.
+ - It has no additional dependencies.
+ - `TikTokMarketing` supports the latest version of the API `v1.3`
 
 
 The API returns data on 4 distinct levels:
@@ -24,7 +33,7 @@ For a list of these please refer to the official documentation:
  - [Dimensions](https://ads.tiktok.com/marketing_api/docs?id=1751443956638721)
  - [Metrics](https://ads.tiktok.com/marketing_api/docs?id=1751443967255553)
 
-## Examples
+## Example usage
 
 ### To query data at the ad level:
 ```
