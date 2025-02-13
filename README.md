@@ -12,137 +12,186 @@ This package enables efficient querying and retrieval of performance metrics fro
 ```
 pip install TikTokMarketing
 ```
+
 ## Features
  - Distributed via PyPI.
  - Wrapper around the TikTok Marketing API to assist marketers on a budget with their reporting.
  - Under the hood `TikTokMarketing` makes use of the `requests` and `json` modules.
  - It has no additional dependencies.
  - `TikTokMarketing` supports the latest version of the API `v1.3`
+ - Supports both basic and audience reporting
+ - Includes human-readable interest category mapping
 
+## Data Levels
 
 The API returns data on 4 distinct levels:
 
 1. AUCTION_ADVERTISER
-1. AUCTION_CAMPAIGN
-1. AUCTION_ADGROUP
-1. AUCTION_AD
+2. AUCTION_CAMPAIGN
+3. AUCTION_ADGROUP
+4. AUCTION_AD
 
-You can pass your own dimensions and metrics as a list:
-
-For a list of these please refer to the official documentation:
+For available dimensions and metrics, refer to the official documentation:
  - [Dimensions](https://ads.tiktok.com/marketing_api/docs?id=1751443956638721)
  - [Metrics](https://ads.tiktok.com/marketing_api/docs?id=1751443967255553)
 
-## Example usage
+## Example Usage
 
-### To query data at the ad level:
-```
-Data_Level = 'AUCTION_AD'
+### Basic Setup
+```python
+from TikTokMarketing import TikTokAPI, InterestCategories
+from datetime import datetime, timedelta
 
-# Custom Metrics and Dimensions to report on
-metrics = [
-        'campaign_name', 'adgroup_name', 'ad_name', 'currency', 'spend', 'impressions', 'clicks', 'conversion'
-    ]
+# Initialize the API
+api = TikTokAPI('YOUR_ACCESS_TOKEN')
 
-dimensions = [
-    'ad_id' ,'stat_time_day'
-]
-
+# Set up date range
+end_date = datetime.now().strftime('%Y-%m-%d')
+start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
 ```
 
-### Querying data at the ad group level:
-```
-Data_Level = 'AUCTION_ADGROUP'
-
-# Custom Metrics and Dimensions to report on
-metrics = [
-        'campaign_name', 'adgroup_name', 'currency', 'spend',  'impressions', 'clicks', 'conversion'
-    ]
-
-dimensions = [
-    'stat_time_day', 'adgroup_id'
-]
-
+### Basic Reporting
+```python
+# Basic reporting at advertiser level
+basic_result = api.get_data(
+    start_date=start_date,
+    end_date=end_date,
+    dimensions=['advertiser_id', 'stat_time_day'],
+    metrics=['spend', 'impressions', 'clicks'],
+    advertiser_id='YOUR_ADVERTISER_ID',
+    data_level='AUCTION_ADVERTISER'
+)
 ```
 
-### Querying at the campaign level:
+### Audience Reporting
 
+#### Age Distribution
+```python
+age_result = api.get_data(
+    start_date=start_date,
+    end_date=end_date,
+    dimensions=['age'],
+    metrics=['spend', 'impressions', 'clicks'],
+    advertiser_id='YOUR_ADVERTISER_ID',
+    data_level='AUCTION_ADVERTISER',
+    report_type='AUDIENCE',
+    audience_dimensions=['age'],
+    order_field='spend',
+    order_type='ASC'
+)
 ```
-Data_Level = 'AUCTION_CAMPAIGN'
 
-# Custom Metrics and Dimensions to report on
-metrics = [
-        'campaign_name', 'currency', 'spend',  'impressions', 'clicks', 'conversion'
-    ]
-
-dimensions = [
-    'stat_time_day', 'campaign_id'
-]
-
+#### Gender and Age Combined
+```python
+gender_age_result = api.get_data(
+    start_date=start_date,
+    end_date=end_date,
+    dimensions=['gender', 'age', 'stat_time_day'],
+    metrics=['spend', 'impressions', 'reach'],
+    advertiser_id='YOUR_ADVERTISER_ID',
+    data_level='AUCTION_ADVERTISER',
+    report_type='AUDIENCE',
+    audience_dimensions=['gender', 'age']
+)
 ```
 
-### Querying at the advertiser level:
+#### Geographic Distribution
+```python
+country_result = api.get_data(
+    start_date=start_date,
+    end_date=end_date,
+    dimensions=['country_code'],
+    metrics=['impressions', 'reach', 'spend'],
+    advertiser_id='YOUR_ADVERTISER_ID',
+    data_level='AUCTION_ADVERTISER',
+    report_type='AUDIENCE',
+    audience_dimensions=['country_code'],
+    order_field='impressions',
+    order_type='DESC'
+)
 ```
-Data_Level = 'AUCTION_ADVERTISER'
 
-# Custom Metrics and Dimensions to report on
-metrics = [
-       'advertiser_name', 'currency', 'spend',  'impressions', 'clicks', 'conversion'
-    ]
+#### Audience Network Analysis
+```python
+network_result = api.get_data(
+    start_date=start_date,
+    end_date=end_date,
+    dimensions=['ac'],
+    metrics=['impressions', 'reach', 'spend'],
+    advertiser_id='YOUR_ADVERTISER_ID',
+    data_level='AUCTION_ADVERTISER',
+    report_type='AUDIENCE',
+    audience_dimensions=['ac'],
+    order_field='impressions',
+    order_type='DESC'
+)
+```
 
-dimensions = [
-    'stat_time_day', 'advertiser_id'
-]
+#### Interest Categories
+```python
+# Get and map interest categories
+interest_result = InterestCategories.map_response(
+    api.get_data(
+        start_date=start_date,
+        end_date=end_date,
+        dimensions=['interest_category'],
+        metrics=['impressions', 'reach', 'spend', 'clicks'],
+        advertiser_id='YOUR_ADVERTISER_ID',
+        data_level='AUCTION_ADVERTISER',
+        report_type='AUDIENCE',
+        audience_dimensions=['interest_category'],
+        order_field='impressions',
+        order_type='DESC'
+    )
+)
 ```
-### Connecting to the API:
-```
-from datetime import date
-from dateutil.relativedelta import relativedelta
+
+### Converting Results to Pandas DataFrame
+```python
 import pandas as pd
-from TikTokMarketing import TikTokAPI 
 
-tik_tok_advertiser_id = '123344555556667' # Enter advertiser id here
+# Create empty dictionary with column names
+dimensions = ['stat_time_day', 'advertiser_id']
+metrics = ['spend', 'impressions', 'clicks']
+all_fields = dimensions + metrics
 
-UpperLimit = date.today() # Must be a date object
-LowerLimit = UpperLimit - relativedelta(days=30) # Must be a date object
-api_service = TikTokAPI('Your API TOKEN HERE')
+TikTok_Data = TikTokAPI.create_dict(input_list=all_fields)
 
-# Max time span is 30 days.
-result = api_service.get_data(
-    start_date    = LowerLimit, 
-    end_date      = UpperLimit, 
-    dimensions    = dimensions, 
-    metrics       = metrics,
-    advertiser_id = tik_tok_advertiser_id, 
-    data_level    = Data_Level)
-
-result_list = result.get('data').get('list')
-
-print(f' *** Processing request id: {result.get("request_id")} ***')
-
-print(f" *** API repsonse: '{result.get('message')}'")
-
-```
-### Unpacking the results and creating a pandas dataframe from it:
-```
-
-# Iterate through the list : You have two keys -  dimensions and metrics
-
-dimensions.extend(metrics)
-
-TikTok_Data = TikTokAPI.create_dict( input_list=dimensions )
-
+# Populate dictionary from API response
+result_list = basic_result.get('data', {}).get('list', [])
 for entry in result_list:
     for fieldname in TikTok_Data.keys():
-        # Look for keyname in dimensions
-        if fieldname in entry.get('dimensions'):
-            TikTok_Data.get(fieldname).append( entry.get('dimensions').get(fieldname) )
-        # Then the key must be in metrics
+        if fieldname in entry.get('dimensions', {}):
+            TikTok_Data[fieldname].append(entry['dimensions'][fieldname])
         else:
-            TikTok_Data.get(fieldname).append( entry.get('metrics').get(fieldname) )
-        
+            TikTok_Data[fieldname].append(entry['metrics'][fieldname])
 
-TikTok_Data = pd.DataFrame(TikTok_Data)
+# Convert to DataFrame
+df = pd.DataFrame(TikTok_Data)
 ```
 
-I have noticed that when trying to run `TikTokMarketing` in a docker containter, the `ip address` is blocked and the API response is `Client IP address is in banned Country list`
+## Note
+When running `TikTokMarketing` in a docker container, the `ip address` might be blocked with the API response: `Client IP address is in banned Country list`
+
+## Available Parameters
+
+### Report Types
+- BASIC
+- AUDIENCE
+
+### Audience Dimensions
+- gender
+- age
+- country_code
+- ac (Audience network)
+- platform
+- interest_category
+- language
+- device_brand
+- device_model
+- device_price
+- network
+
+### Order Types
+- ASC
+- DESC
